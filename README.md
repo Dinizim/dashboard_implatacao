@@ -1,4 +1,4 @@
-# Dashboard de Implantações — SJC
+# Dashboard de Implantações — Athos
 
 Dashboard para acompanhar clientes em processo de implantação, do cadastro até o suporte definitivo.
 
