@@ -27,7 +27,7 @@ O dashboard mostra:
 ```bash
 # 1. Clonar o projeto
 git clone https://github.com/Dinizim/dashboard_implatacao.git
-cd seu-repositorio
+cd dashboard_implatacao
 
 # 2. Instalar as dependências
 npm install
