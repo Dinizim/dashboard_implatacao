@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import { X, Building2, Phone, MapPin, Calendar, Loader2, User, Rocket, FileText, CheckCircle2 } from "lucide-react"
-import { Cliente } from "@/app/types/cliente"
+import { Cliente } from "@/lib/domain/cliente"
 
 function formatarData(data: string | null | undefined): string {
   if (!data) return "—"

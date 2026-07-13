@@ -1,100 +1,52 @@
+/**
+ * GET /api/cliente-historico?idcliente=123
+ *
+ * Retorna o histórico de acompanhamento semanal de um cliente específico,
+ * extraído da ocorrência de "Processo de Implantação" registrada no sistema.
+ *
+ * Resposta:
+ *   kickoff             – dados do kick-off / primeiro contato
+ *   semanas             – objeto { 1: {...}, 2: {...}, ... } com cada semana registrada
+ *   observacoesGerais   – observações finais antes do suporte definitivo
+ *   implantacaoFinalizada – true se a ocorrência foi marcada como solução
+ */
+
 import { NextRequest } from "next/server"
-import { db } from "@/lib/db"
+import { buscarOcorrenciaImplantacao, buscarHistoricoOcorrencia } from "@/lib/queries/ocorrencias"
+import { parsearHistorico } from "@/lib/domain/historico"
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl
-  const idcliente = searchParams.get("idcliente")
+  const idclienteParam = searchParams.get("idcliente")
 
-  if (!idcliente) {
-    return Response.json({ error: "idcliente é obrigatório" }, { status: 400 })
+  if (!idclienteParam) {
+    return Response.json({ error: "Parâmetro 'idcliente' é obrigatório" }, { status: 400 })
+  }
+
+  const idcliente = parseInt(idclienteParam)
+  if (isNaN(idcliente)) {
+    return Response.json({ error: "Parâmetro 'idcliente' deve ser um número" }, { status: 400 })
   }
 
   try {
-    // 1. Busca a ocorrência de "Processo de Implantação" do cliente
-    const ocorrenciaResult = await db.query(`
-      SELECT idocorrencia, dataabertura, datafechamento
-      FROM ocorrencia
-      WHERE idcliente = $1
-        AND descricao ILIKE '%Processo de Implantação%'
-      ORDER BY dataabertura DESC
-      LIMIT 1
-    `, [idcliente])
+    const ocorrencia = await buscarOcorrenciaImplantacao(idcliente)
 
-    if (ocorrenciaResult.rows.length === 0) {
+    // Sem ocorrência: retorna estrutura vazia (não é erro, cliente pode não ter histórico)
+    if (!ocorrencia) {
       return Response.json({
         kickoff: null,
-        semanas: [],
+        semanas: {},
         observacoesGerais: null,
         implantacaoFinalizada: false,
       })
     }
 
-    const idocorrencia = ocorrenciaResult.rows[0].idocorrencia
+    const registros = await buscarHistoricoOcorrencia(ocorrencia.idocorrencia)
+    const historico = parsearHistorico(registros)
 
-    // 2. Busca todos os registros do histórico dessa ocorrência
-    const historicoResult = await db.query(`
-      SELECT iddescricaohistorico, descricao, datahistorico, horahistorico, solucao
-      FROM descricao_historico
-      WHERE idocorrencia = $1
-      ORDER BY datahistorico ASC, horahistorico ASC
-    `, [idocorrencia])
-
-    const registros = historicoResult.rows
-
-    // 3. Classifica cada registro pelo conteúdo da descrição
-    let kickoff: { data: string; observacao: string } | null = null
-    const semanas: Record<number, { data: string; observacao: string }> = {}
-    let observacoesGerais: { data: string; observacao: string } | null = null
-    let implantacaoFinalizada = false
-
-    registros.forEach(r => {
-      const texto = r.descricao as string
-      const data = r.datahistorico
-
-      // Kick-off / primeiro contato
-      if (/observa[çc][õo]es kick-?off|primeiro contato/i.test(texto)) {
-        kickoff = {
-          data,
-          observacao: texto.split(":").slice(1).join(":").trim(),
-        }
-        return
-      }
-
-      // Semana N
-      const matchSemana = texto.match(/semana\s*(\d+)/i)
-      if (matchSemana) {
-        const numero = parseInt(matchSemana[1])
-        semanas[numero] = {
-          data,
-          observacao: texto.split(":").slice(1).join(":").trim(),
-        }
-        return
-      }
-
-      // Observações gerais
-      if (/observa[çc][õo]es gerais/i.test(texto)) {
-        observacoesGerais = {
-          data,
-          observacao: texto.split(":").slice(1).join(":").trim(),
-        }
-        return
-      }
-
-      // Implantação finalizada
-      if (/implanta[çc][ãa]o finalizada/i.test(texto) || r.solucao === true) {
-        implantacaoFinalizada = true
-      }
-    })
-
-    return Response.json({
-      kickoff,
-      semanas, // objeto { 1: {...}, 2: {...} }
-      observacoesGerais,
-      implantacaoFinalizada,
-    })
-
+    return Response.json(historico)
   } catch (error) {
-    console.error(error)
-    return Response.json({ error: "Erro ao buscar histórico" }, { status: 500 })
+    console.error("[/api/cliente-historico]", error)
+    return Response.json({ error: "Erro interno ao buscar histórico" }, { status: 500 })
   }
 }

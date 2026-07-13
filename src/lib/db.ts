@@ -7,7 +7,7 @@ export const db =
   new Pool({
     host: "localhost",
     user: "postgres",
-    database: "atenthos",
+    database: "atenthos 2",
     password: "senha",
     port: 5433,
   })

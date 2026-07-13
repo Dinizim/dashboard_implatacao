@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { type FiltroAtivo } from "@/app/types/dashboard";
-import { type Cliente } from "@/app/types/cliente";
+import { type Cliente } from "@/lib/domain/cliente";
 import { ClienteViewer } from "../ClienteViewer";
 import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 
