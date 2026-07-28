@@ -1,3 +1,13 @@
+# Dashboard de Implantação
+
+<p align="center">
+  <img src="image/preview.webp" alt="Preview do Dashboard" width="100%">
+</p>
+
+Dashboard desenvolvido em **Next.js**, **TypeScript** e **PostgreSQL** para gerenciamento do fluxo de implantação de clientes, com KPIs, relatórios e acompanhamento em tempo real.
+
+---
+
 # Documentação das Rotas de API
 
 Todas as rotas estão em `app/api/` e seguem o padrão do Next.js App Router.
@@ -276,3 +286,28 @@ lib/
     ├── clientes.ts          ← SELECTs de clientes (dados brutos)
     └── ocorrencias.ts       ← SELECTs de ocorrência e histórico
 ```
+
+---
+
+# 📸 Preview da Aplicação
+
+Dashboard desenvolvido para acompanhamento do processo de implantação de clientes, permitindo visualizar indicadores em tempo real, etapas da implantação, clientes críticos e relatórios anuais.
+
+<p align="center">
+  <img src="image/preview.webp" alt="Dashboard de Implantação" width="100%">
+</p>
+
+### Funcionalidades demonstradas
+
+- 📊 Dashboard com KPIs de implantação
+- 📈 Gráfico das etapas de implantação
+- 👥 Visualização de clientes críticos
+- 🔍 Filtros por período
+- 📅 Relatório anual de desempenho
+- ⚡ Atualização dos dados via API do Next.js
+
+<p align="center">
+  <a href="https://SEU-LINK-AQUI.com">
+    <strong>🚀 Acessar Demonstração</strong>
+  </a>
+</p>
