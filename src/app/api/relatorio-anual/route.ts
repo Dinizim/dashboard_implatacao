@@ -38,14 +38,14 @@ export async function GET(request: NextRequest) {
       ORDER BY mes
     `, [ano, ...REVENDAS_PERMITIDAS])
 
-    const porMes: Record<number, any> = {}
-    result.rows.forEach(r => { porMes[parseInt(r.mes)] = r })
+    const porMes: Record<number, Record<string, string | number | null>> = {}
+    result.rows.forEach(r => { porMes[Number(r.mes)] = r })
 
     const linhas = MESES.map((label, i) => {
       const mes = i + 1
       const d   = porMes[mes] ?? {}
 
-      const n = (campo: string) => parseInt(d[campo]) || 0
+      const n = (campo: string) => Number(d[campo]) || 0
 
       const totalImplantacoes = n("kickoff") + n("instalacao") + n("t_cadastro") + n("t_vendas") + n("sup_definitivo")
       const deficit           = n("qtd_vendas") - totalImplantacoes

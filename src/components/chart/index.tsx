@@ -1,14 +1,12 @@
 "use client"
-import { PieChart, Pie, Cell, Tooltip, Legend, Sector } from "recharts"
+import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { ChartContainer } from "../ui/chart"
 import { type ChartConfig } from "@/components/ui/chart"
 import { BarChart2, Loader2 } from "lucide-react"
-import { type FiltroAtivo } from "@/app/types/dashboard"
 import { useState, useEffect } from "react"
 
 interface Props {
-  filtroAtivo: FiltroAtivo;
   onEtapaClick: (etapa: string) => void;
   dataInicio: string;
   dataFim: string;
@@ -24,30 +22,19 @@ const chartConfig = {
 
 const COLORS = ["#7c3aed", "#16a34a", "#2563eb", "#ca8a04", "#dc2626"]
 
-const renderActiveShape = (props: any) => {
-  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
-  return (
-    <g>
-      <Sector cx={cx} cy={cy} innerRadius={innerRadius} outerRadius={outerRadius + 10} startAngle={startAngle} endAngle={endAngle} fill={fill} />
-      <Sector cx={cx} cy={cy} innerRadius={outerRadius + 14} outerRadius={outerRadius + 18} startAngle={startAngle} endAngle={endAngle} fill={fill} opacity={0.3} />
-    </g>
-  );
-};
-
 type EtapaData = { etapa: string; value: number }
 
-export function ChartOverview({ filtroAtivo, onEtapaClick, dataInicio, dataFim }: Props) {
+export function ChartOverview({ onEtapaClick, dataInicio, dataFim }: Props) {
   const [hoverIndex, setHoverIndex]   = useState<number | undefined>(undefined)
   const [clickIndex, setClickIndex]   = useState<number | undefined>(undefined)
   const [chartData, setChartData]     = useState<EtapaData[]>([])
-  const [loading, setLoading]         = useState(false)
+  const [loading, setLoading]         = useState(true)
 
   const activeIndex = hoverIndex ?? clickIndex
 
   // Busca os dados da API quando o período muda
   useEffect(() => {
     if (!dataInicio || !dataFim) return
-    setLoading(true)
     fetch(`/api/etapas?inicio=${dataInicio}&fim=${dataFim}`)
       .then(res => res.json())
       .then(data => {
@@ -93,8 +80,6 @@ export function ChartOverview({ filtroAtivo, onEtapaClick, dataInicio, dataFim }
                 cx="50%"
                 cy="50%"
                 outerRadius={100}
-                activeIndex={activeIndex}
-                activeShape={renderActiveShape}
                 onClick={(data, index) => {
                   if (data && data.name) {
                     if (clickIndex === index) {
@@ -119,7 +104,7 @@ export function ChartOverview({ filtroAtivo, onEtapaClick, dataInicio, dataFim }
                   />
                 ))}
               </Pie>
-              <Tooltip formatter={(value: number, name: string) => [`${value} clientes`, name]} />
+              <Tooltip formatter={(value, name) => [`${value ?? 0} clientes`, String(name ?? "")] as const} />
               <Legend />
             </PieChart>
           </ChartContainer>

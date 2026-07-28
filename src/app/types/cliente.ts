@@ -11,7 +11,7 @@ export type Cliente = {
   cnpj: string;
   endereco: string;
   telefone: string;
-
+  status: string;
   dataCad: string;
   dataApro: string;
   dataAss: string;

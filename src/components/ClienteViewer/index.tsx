@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
-import { X, Building2, Phone, MapPin, Calendar, Loader2, User, Rocket, FileText, CheckCircle2 } from "lucide-react"
-import { Cliente } from "@/lib/domain/cliente"
+import { X, Building2, Phone, Calendar, Loader2, User, Rocket, FileText, CheckCircle2 } from "lucide-react"
+import { type Cliente } from "@/app/types/cliente"
 
 function formatarData(data: string | null | undefined): string {
   if (!data) return "—"
@@ -39,7 +39,6 @@ export function ClienteViewer({ cliente, onClose }: Props) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setLoading(true)
     fetch(`/api/cliente-historico?idcliente=${cliente.codigo}`)
       .then(res => res.json())
       .then(data => setHistorico(data))

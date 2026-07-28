@@ -6,7 +6,6 @@
  */
 
 import { db } from "../db"
-import { REVENDAS_PERMITIDAS, placeholdersRevendas } from "@/lib/domain/revendas"
 
 // ─────────────────────────────────────────────
 // SELECT base — campos que todas as queries precisam
@@ -99,7 +98,7 @@ export async function buscarClientesPorKpi(
   dataInicio: string,
   dataFim: string
 ) {
-  const queries: Record<string, { sql: string; params: any[] }> = {
+  const queries: Record<string, { sql: string; params: string[] }> = {
     vendidos: {
       sql: `${SELECT_CLIENTE_BASE} WHERE c.datacadastro BETWEEN $1 AND $2 AND c.dataassinaturacontrato IS NOT NULL ORDER BY dias DESC`,
       params: [dataInicio, dataFim],

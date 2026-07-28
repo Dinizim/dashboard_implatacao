@@ -8,7 +8,6 @@
  *   - clientes de anos anteriores que ainda não finalizaram (sem suporte definitivo)
  */
 
-import { NextRequest } from "next/server"
 import { buscarClientesPorAno } from "@/lib/queries/clientes"
 import {
   calcularEtapaAtual,
@@ -19,7 +18,7 @@ import {
 } from "@/lib/domain/cliente"
 import { ETAPA_LABEL, STATUS_LABEL } from "@/lib/domain/labels"
 
-export async function GET(_request: NextRequest) {
+export async function GET() {
   try {
     const brutos = await buscarClientesPorAno()
 
