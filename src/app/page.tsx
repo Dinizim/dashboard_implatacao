@@ -1,5 +1,6 @@
 "use client"
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect } from "react"
+import { type LucideIcon } from "lucide-react"
 import { ChartOverview } from "@/components/chart"
 import { Viewer } from "@/components/Viewer"
 import { RelatorioAnualTable } from "@/components/RelatorioAnualTable/RelatorioAnualTable"
@@ -105,7 +106,7 @@ export default function Home() {
 
   // ── Estado: KPIs mensais ──
   const [kpis, setKpis] = useState<KpisType>(kpisZero)
-  const [loadingKpis, setLoadingKpis] = useState(false)
+  const [loadingKpis, setLoadingKpis] = useState(true)
   const [erroKpis, setErroKpis] = useState("")
 
   // ── Estado: filtro do Viewer/gráfico de etapas ──
@@ -116,31 +117,23 @@ export default function Home() {
   // ── Estado: ano ativo + KPIs anuais ──
   const [anoAtivo, setAnoAtivo] = useState(2026)
   const [kpisAnuais, setKpisAnuais] = useState<KpisAnuaisType>(kpisAnuaisZero)
-  const [loadingAnual, setLoadingAnual] = useState(false)
+  const [loadingAnual, setLoadingAnual] = useState(true)
 
   // ── Busca KPIs mensais ──
-  const buscarKpis = useCallback(async () => {
+  useEffect(() => {
     if (!dataInicio || !dataFim) return
-    setLoadingKpis(true)
-    setErroKpis("")
-    try {
-      const res = await fetch(`/api/kpis?inicio=${dataInicio}&fim=${dataFim}`)
-      if (!res.ok) throw new Error("Erro na API")
-      const data = await res.json()
-      setKpis(data.kpis)
-    } catch {
-      setErroKpis("Não foi possível carregar os dados.")
-      setKpis(kpisZero)
-    } finally {
-      setLoadingKpis(false)
-    }
+    fetch(`/api/kpis?inicio=${dataInicio}&fim=${dataFim}`)
+      .then(res => {
+        if (!res.ok) throw new Error("Erro na API")
+        return res.json()
+      })
+      .then(data => { setKpis(data.kpis); setErroKpis("") })
+      .catch(() => { setErroKpis("Não foi possível carregar os dados."); setKpis(kpisZero) })
+      .finally(() => setLoadingKpis(false))
   }, [dataInicio, dataFim])
-
-  useEffect(() => { buscarKpis() }, [buscarKpis])
 
   // ── Busca KPIs anuais ──
   useEffect(() => {
-    setLoadingAnual(true)
     fetch(`/api/kpis-anuais?ano=${anoAtivo}`)
       .then(res => res.json())
       .then(data => setKpisAnuais(data))
@@ -180,7 +173,6 @@ export default function Home() {
 
       <section className="flex flex-col md:flex-row gap-4">
         <ChartOverview
-          filtroAtivo={filtroAtivo}
           onEtapaClick={(etapa) => setFiltroAtivo({ tipo: "etapa", label: etapa, chave: etapa })}
           dataInicio={dataInicio}
           dataFim={dataFim}
@@ -309,7 +301,7 @@ function SecaoAnual({
   anoAtivo: number
   anos: number[]
   onChangeAno: (ano: number) => void
-  kpisAnuais: { label: string; valor: string | number; desc: string; icon: any; color: string }[]
+  kpisAnuais: { label: string; valor: string | number; desc: string; icon: LucideIcon; color: string }[]
   loading: boolean
 }) {
   const idx = anos.indexOf(anoAtivo)

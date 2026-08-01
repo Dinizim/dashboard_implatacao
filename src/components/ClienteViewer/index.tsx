@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import { X, Building2, Phone, KeyRound, Store, Calendar, Loader2, User, Rocket, FileText, CheckCircle2, Clock } from "lucide-react"
-import { Cliente } from "@/app/types/cliente"
+import { type Cliente } from "@/app/types/cliente"
 import type { EtapaSla, StatusSla } from "@/lib/domain/sla"
 
 function formatarData(data: string | null | undefined): string {
@@ -84,7 +84,6 @@ export function ClienteViewer({ cliente, onClose }: Props) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setLoading(true)
     fetch(`/api/cliente-historico?idcliente=${cliente.codigo}`)
       .then(res => res.json())
       .then(data => setHistorico(data))

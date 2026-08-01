@@ -307,7 +307,7 @@ Dashboard desenvolvido para acompanhamento do processo de implantação de clien
 - ⚡ Atualização dos dados via API do Next.js
 
 <p align="center">
-  <a href="https://SEU-LINK-AQUI.com">
+  <a href="https://dashboard-implatacao.vercel.app/">
     <strong>🚀 Acessar Demonstração</strong>
   </a>
 </p>

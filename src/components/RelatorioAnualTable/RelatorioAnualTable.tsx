@@ -21,7 +21,9 @@ interface Props {
   ano: number;
 }
 
-const LINHAS_CONFIG = [
+type RelatorioKey = Exclude<keyof LinhaRelatorio, "mes">
+
+const LINHAS_CONFIG: ReadonlyArray<{ key: RelatorioKey; label: string; destaque?: boolean }> = [
   { key: "qtdVendas",         label: "Qtd Vendas" },
   { key: "qtdSemEtapa",       label: "Qtd s/ etapa" },
   { key: "qtdCancelados",     label: "Qtd cancelados" },
@@ -32,15 +34,14 @@ const LINHAS_CONFIG = [
   { key: "supDefinitivo",     label: "Sup Definitivo" },
   { key: "totalImplantacoes", label: "Total Implantações", destaque: true },
   { key: "deficit",           label: "Deficit Implantações", destaque: true },
-] as const
+]
 
 export function RelatorioAnualTable({ ano }: Props) {
   const [linhas, setLinhas] = useState<LinhaRelatorio[]>([])
   const [totais, setTotais] = useState<Record<string, number> | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    setLoading(true)
     fetch(`/api/relatorio-anual?ano=${ano}`)
       .then(res => res.json())
       .then(data => {

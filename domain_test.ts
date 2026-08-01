@@ -7,7 +7,6 @@
 
 import {
   calcularEtapaAtual,
-  calcularDiasImplantacao,
   calcularStatusPrazo,
   calcularStatusCliente,
   type ClienteBruto,

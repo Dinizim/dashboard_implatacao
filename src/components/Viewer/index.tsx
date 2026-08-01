@@ -45,25 +45,23 @@ export function Viewer({ filtro, dataInicio, dataFim }: Props) {
   const [clienteAberto, setClienteAberto] = useState<Cliente | null>(null)
 
   // Reseta a página quando muda o filtro ou período
-  useEffect(() => { setPagina(1) }, [filtro, dataInicio, dataFim])
-
   useEffect(() => {
     if (!filtro.chave || !dataInicio || !dataFim) return
 
     const chaveApi = filtro.chave
 
-    setLoading(true)
     fetch(`/api/clientes-viewer?filtro=${encodeURIComponent(chaveApi)}&inicio=${dataInicio}&fim=${dataFim}`)
       .then(res => res.json())
-      .then(data => setClientes(data.clientes ?? []))
-      .catch(() => setClientes([]))
+      .then(data => { setClientes(data.clientes ?? []); setPagina(1) })
+      .catch(() => { setClientes([]); setPagina(1) })
       .finally(() => setLoading(false))
   }, [filtro, dataInicio, dataFim])
 
   // Paginação
   const total          = clientes.length
   const totalPaginas    = Math.ceil(total / POR_PAGINA)
-  const inicio          = (pagina - 1) * POR_PAGINA
+  const paginaAtual     = Math.min(pagina, totalPaginas || 1)
+  const inicio          = (paginaAtual - 1) * POR_PAGINA
   const clientesPagina  = clientes.slice(inicio, inicio + POR_PAGINA)
 
   function abrirCliente(c: ClienteResumo) {
@@ -75,6 +73,7 @@ export function Viewer({ filtro, dataInicio, dataFim }: Props) {
       revenda: c.revenda,
       endereco: "",
       telefone: c.telefone,
+      status: "",
       dataCad: "",
       dataApro: "",
       dataAss: c.assinatura,
@@ -157,7 +156,7 @@ export function Viewer({ filtro, dataInicio, dataFim }: Props) {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => setPagina(p => Math.max(1, p - 1))}
-                      disabled={pagina === 1}
+                      disabled={paginaAtual === 1}
                       className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-30 transition-colors"
                     >
                       <ChevronLeft className="h-4 w-4 text-gray-500" />
@@ -168,7 +167,7 @@ export function Viewer({ filtro, dataInicio, dataFim }: Props) {
                         key={p}
                         onClick={() => setPagina(p)}
                         className={`w-7 h-7 rounded-lg text-xs font-medium transition-colors ${
-                          p === pagina
+                          p === paginaAtual
                             ? "bg-blue-600 text-white"
                             : "hover:bg-gray-100 text-gray-500"
                         }`}
@@ -179,7 +178,7 @@ export function Viewer({ filtro, dataInicio, dataFim }: Props) {
 
                     <button
                       onClick={() => setPagina(p => Math.min(totalPaginas, p + 1))}
-                      disabled={pagina === totalPaginas}
+                      disabled={paginaAtual === totalPaginas}
                       className="p-1.5 rounded-lg hover:bg-gray-100 disabled:opacity-30 transition-colors"
                     >
                       <ChevronRight className="h-4 w-4 text-gray-500" />

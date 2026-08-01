@@ -44,10 +44,7 @@ export default function ClientesPage() {
   const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(null);
 
   // Reseta página ao mudar qualquer filtro
-  useEffect(() => { setPagina(1) }, [busca, filtroStatus, filtroEtapa, filtroPrazo])
-
   useEffect(() => {
-    setLoading(true);
     fetch("/api/clientes-pagina")
       .then(res => res.json())
       .then(data => setClientes(data.clientes ?? []))
@@ -99,13 +96,13 @@ export default function ClientesPage() {
                 placeholder="Buscar por nome, código ou CNPJ..."
                 className="pl-8"
                 value={busca}
-                onChange={e => setBusca(e.target.value)}
+                onChange={e => { setBusca(e.target.value); setPagina(1) }}
               />
             </div>
             <select
               className="border rounded-md px-3 py-2 text-sm bg-white text-gray-700 cursor-pointer"
               value={filtroStatus}
-              onChange={e => setFiltroStatus(e.target.value)}
+              onChange={e => { setFiltroStatus(e.target.value); setPagina(1) }}
             >
               <option value="TODOS">Todos os status</option>
               <option value="Ativo">Ativo</option>
@@ -116,7 +113,7 @@ export default function ClientesPage() {
             <select
               className="border rounded-md px-3 py-2 text-sm bg-white text-gray-700 cursor-pointer"
               value={filtroEtapa}
-              onChange={e => setFiltroEtapa(e.target.value)}
+              onChange={e => { setFiltroEtapa(e.target.value); setPagina(1) }}
             >
               <option value="TODAS">Todas as etapas</option>
               {etapas.map(e => <option key={e} value={e}>{e}</option>)}
@@ -124,7 +121,7 @@ export default function ClientesPage() {
             <select
               className="border rounded-md px-3 py-2 text-sm bg-white text-gray-700 cursor-pointer"
               value={filtroPrazo}
-              onChange={e => setFiltroPrazo(e.target.value)}
+              onChange={e => { setFiltroPrazo(e.target.value); setPagina(1) }}
             >
               <option value="TODOS">Todos os prazos</option>
               <option value="0-39">🔵 Até 39 dias</option>
