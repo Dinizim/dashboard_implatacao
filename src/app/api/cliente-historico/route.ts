@@ -13,7 +13,10 @@
 
 import { NextRequest } from "next/server"
 import { buscarOcorrenciaImplantacao, buscarHistoricoOcorrencia } from "@/lib/queries/ocorrencias"
+import { buscarClientePorId } from "@/lib/queries/clientes"
+import { buscarSlaConfig } from "@/lib/queries/sla"
 import { parsearHistorico } from "@/lib/domain/historico"
+import { calcularSlaPorCliente } from "@/lib/domain/sla"
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl
@@ -29,6 +32,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    const clienteBruto = await buscarClientePorId(idcliente)
+    const slaConfig = await buscarSlaConfig()
+    const sla = clienteBruto ? calcularSlaPorCliente(clienteBruto, slaConfig) : []
+
     const ocorrencia = await buscarOcorrenciaImplantacao(idcliente)
 
     // Sem ocorrência: retorna estrutura vazia (não é erro, cliente pode não ter histórico)
@@ -38,13 +45,14 @@ export async function GET(request: NextRequest) {
         semanas: {},
         observacoesGerais: null,
         implantacaoFinalizada: false,
+        sla,
       })
     }
 
     const registros = await buscarHistoricoOcorrencia(ocorrencia.idocorrencia)
     const historico = parsearHistorico(registros)
 
-    return Response.json(historico)
+    return Response.json({ ...historico, sla })
   } catch (error) {
     console.error("[/api/cliente-historico]", error)
     return Response.json({ error: "Erro interno ao buscar histórico" }, { status: 500 })

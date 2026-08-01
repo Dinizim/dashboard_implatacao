@@ -32,6 +32,8 @@ export async function GET(_request: NextRequest) {
         codigo:             String(c.idcliente),
         nome:               c.nomecliente,
         cnpj:               c.cnpj ?? "",
+        quantidadeLicenca:  c.quantidadelicenca ?? null,
+        revenda:            c.revendanome ?? "",
         endereco:           montarEndereco(c),
         telefone:           montarTelefone(c),
         dataCad:            c.datacadastro,

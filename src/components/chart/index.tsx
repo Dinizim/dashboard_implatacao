@@ -93,7 +93,7 @@ export function ChartOverview({ filtroAtivo, onEtapaClick, dataInicio, dataFim }
                 cx="50%"
                 cy="50%"
                 outerRadius={100}
-                activeIndex={activeIndex}
+                {...({ activeIndex } as any)}
                 activeShape={renderActiveShape}
                 onClick={(data, index) => {
                   if (data && data.name) {
@@ -119,7 +119,7 @@ export function ChartOverview({ filtroAtivo, onEtapaClick, dataInicio, dataFim }
                   />
                 ))}
               </Pie>
-              <Tooltip formatter={(value: number, name: string) => [`${value} clientes`, name]} />
+              <Tooltip formatter={((value: number, name: string) => [`${value} clientes`, name]) as any} />
               <Legend />
             </PieChart>
           </ChartContainer>

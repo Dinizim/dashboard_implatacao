@@ -19,6 +19,7 @@ import { buscarClientesPorKpi, buscarClientesPorEtapa } from "@/lib/queries/clie
 import {
   calcularEtapaAtual,
   calcularDiasImplantacao,
+  montarTelefone,
 } from "@/lib/domain/cliente"
 import { ETAPA_LABEL } from "@/lib/domain/labels"
 
@@ -51,8 +52,12 @@ export async function GET(request: NextRequest) {
       : await buscarClientesPorKpi(filtro, dataInicio!, dataFim!)
 
     const clientes = brutos.map(c => ({
-      codigo:     String(c.idcliente),
-      nome:       c.nomecliente,
+      codigo:            String(c.idcliente),
+      nome:              c.nomecliente,
+      cnpj:              c.cnpj ?? "",
+      telefone:          montarTelefone(c),
+      quantidadeLicenca: c.quantidadelicenca ?? null,
+      revenda:           c.revendanome ?? "",
       dias:       calcularDiasImplantacao(c),
       etapaAtual: ETAPA_LABEL[calcularEtapaAtual(c)],
       assinatura: c.dataassinaturacontrato,

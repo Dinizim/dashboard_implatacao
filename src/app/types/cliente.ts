@@ -9,6 +9,8 @@ export type Cliente = {
   codigo: string;
   nome: string;
   cnpj: string;
+  quantidadeLicenca: number | null;
+  revenda: string;
   endereco: string;
   telefone: string;
 
@@ -25,6 +27,7 @@ export type Cliente = {
   diasImplantacao: number;
   dentroDoProazo: "DENTRO" | "FORA";
   etapaAtual: string;
+  status: string;
 
   semanas: Semana[];
 };

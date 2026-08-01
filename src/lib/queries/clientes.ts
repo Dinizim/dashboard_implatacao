@@ -17,6 +17,7 @@ const SELECT_CLIENTE_BASE = `
     c.nomecliente,
     c.revendanome,
     c.cnpj,
+    c.quantidadelicenca,
     c.logradouro,
     c.numero,
     c.bairro,
@@ -139,4 +140,29 @@ export async function buscarClientesPorKpi(
 
   const result = await db.query(q.sql, q.params)
   return result.rows
+}
+
+// ─────────────────────────────────────────────
+// SLA: clientes ativos (ainda sem suporte definitivo) para cálculo de SLA
+// ─────────────────────────────────────────────
+export async function buscarClientesAtivosParaSla() {
+  const result = await db.query(
+    `${SELECT_CLIENTE_BASE}
+     WHERE c.dataassinaturacontrato IS NOT NULL
+       AND c.etapasuportedefinitivo = false
+       AND (c.bloqueaprazo = false OR c.bloqueaprazo IS NULL)
+     ORDER BY dias DESC`
+  )
+  return result.rows
+}
+
+// ─────────────────────────────────────────────
+// Um cliente específico (usado no histórico/SLA do modal)
+// ─────────────────────────────────────────────
+export async function buscarClientePorId(idcliente: number) {
+  const result = await db.query(
+    `${SELECT_CLIENTE_BASE} WHERE c.idcliente = $1`,
+    [idcliente]
+  )
+  return result.rows[0] ?? null
 }

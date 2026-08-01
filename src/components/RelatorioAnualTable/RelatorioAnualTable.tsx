@@ -83,7 +83,7 @@ export function RelatorioAnualTable({ ano }: Props) {
               key={cfg.key}
               className={`
                 border-b border-gray-100
-                ${cfg.destaque ? "bg-blue-50 font-semibold" : idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
+                ${"destaque" in cfg && cfg.destaque ? "bg-blue-50 font-semibold" : idx % 2 === 0 ? "bg-white" : "bg-gray-50"}
               `}
             >
               <td className="px-3 py-2 font-medium text-gray-700 sticky left-0 bg-inherit">

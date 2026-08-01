@@ -3,13 +3,16 @@
 import { Sheet,SheetTrigger,SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { ChartArea, Home, LogOut, Package, PanelBottom, Settings, User } from "lucide-react";
+import { ChartArea, Home, LogOut, Package, PanelBottom, Settings, User, UserCog } from "lucide-react";
+import { SlaAlertas } from "@/components/SlaAlertas";
 
 
 export function Sidebar() {
   return (
     <div className="flex w-full flex-col bg-muted/40">
-        
+
+        <SlaAlertas />
+
         <aside className="fixed inset-y-0 left-0 z-10 hidden w-14 border-r bg-background sm:flex flex-col"
         >
             <nav className="flex flex-col items-center gap-4 py-5 px-2">
@@ -18,7 +21,8 @@ export function Sidebar() {
                      >
                      <Package className="h-4 w-4" />
                      <span className="sr-only">Logo</span>
-                     </Link>                   
+                     </Link>
+
                     <Link
                       href="/"
                       title="Dashboard"
@@ -35,7 +39,15 @@ export function Sidebar() {
                       <User className="h-4 w-4" />
                       <span className="sr-only">clientes</span>
                     </Link>
-                  
+                    <Link
+                      href="/gerente"
+                      title="Gerente"
+                      className=" flex items-center h-9 w-9  rounded-lg text-muted-foreground justify-center shrink-0 transition-colors hover:text-foreground"
+                    >
+                      <UserCog className="h-4 w-4" />
+                      <span className="sr-only">Gerente</span>
+                    </Link>
+
             </nav>
             <nav className="mt-auto flex flex-col items-center gap-4 py-5 px-2">
                     <Link
@@ -92,6 +104,13 @@ export function Sidebar() {
                      >
                      <User className="h-5 w-5 transition-all" />
                      Clientes
+                     </Link>
+                      <Link href="/gerente"
+                           className="flex items-center px-2.5 text-muted-foreground hover:text-foreground gap-4"
+                           prefetch={false}
+                     >
+                     <UserCog className="h-5 w-5 transition-all" />
+                     Gerente
                      </Link>
                       <Link href="#"
                            className="flex items-center px-2.5 text-muted-foreground hover:text-foreground gap-4"

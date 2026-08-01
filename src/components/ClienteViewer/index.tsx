@@ -1,7 +1,8 @@
 "use client"
 import { useState, useEffect } from "react"
-import { X, Building2, Phone, MapPin, Calendar, Loader2, User, Rocket, FileText, CheckCircle2 } from "lucide-react"
-import { Cliente } from "@/lib/domain/cliente"
+import { X, Building2, Phone, KeyRound, Store, Calendar, Loader2, User, Rocket, FileText, CheckCircle2, Clock } from "lucide-react"
+import { Cliente } from "@/app/types/cliente"
+import type { EtapaSla, StatusSla } from "@/lib/domain/sla"
 
 function formatarData(data: string | null | undefined): string {
   if (!data) return "—"
@@ -22,17 +23,61 @@ const prazoColor = (dias: number) => {
 
 type HistoricoSemana = { data: string; observacao: string }
 
+type SlaEtapa = {
+  etapa: EtapaSla
+  label: string
+  horasDecorridas: number
+  slaHoras: number
+  status: StatusSla
+  concluido: boolean
+}
+
 type HistoricoResponse = {
   kickoff: HistoricoSemana | null
   semanas: Record<string, HistoricoSemana>
   observacoesGerais: HistoricoSemana | null
   implantacaoFinalizada: boolean
+  sla: SlaEtapa[]
+}
+
+// Mapeia o label da linha do tempo para a etapa de SLA correspondente
+const ETAPA_SLA_POR_LABEL: Record<string, EtapaSla> = {
+  "Kick-off":        "KICKOFF",
+  "Instalação":      "INSTALACAO",
+  "Trein. Cadastro": "CADASTRO",
+  "Trein. Vendas":   "VENDAS",
+  "Sup. Definitivo": "DEFINITIVO",
+}
+
+function corBadgeSla(status: StatusSla): string {
+  if (status === "ESTOURADO") return "bg-red-100 text-red-700"
+  if (status === "RISCO")     return "bg-yellow-100 text-yellow-700"
+  if (status === "OK")        return "bg-green-100 text-green-700"
+  return "bg-gray-100 text-gray-400"
+}
+
+function SlaBadge({ sla }: { sla?: SlaEtapa }) {
+  if (!sla || sla.status === "NAO_INICIADO") return null
+  return (
+    <span className={`mt-1 inline-flex items-center gap-0.5 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${corBadgeSla(sla.status)}`}>
+      <Clock className="h-2.5 w-2.5" />
+      {sla.horasDecorridas}h/{sla.slaHoras}h
+    </span>
+  )
 }
 
 interface Props {
   cliente: Cliente
   onClose: () => void
 }
+
+const DADOS_PRINCIPAIS = (cliente: Cliente) => [
+  { label: "Nome",     valor: cliente.nome || "—", icon: User,      cor: "bg-blue-50 text-blue-600" },
+  { label: "CNPJ",     valor: cliente.cnpj || "—", icon: Building2, cor: "bg-purple-50 text-purple-600" },
+  { label: "Licenças", valor: cliente.quantidadeLicenca != null ? String(cliente.quantidadeLicenca) : "—", icon: KeyRound, cor: "bg-amber-50 text-amber-600" },
+  { label: "Telefone", valor: cliente.telefone || "—", icon: Phone, cor: "bg-emerald-50 text-emerald-600" },
+  { label: "Revenda",  valor: cliente.revenda || "—", icon: Store,  cor: "bg-rose-50 text-rose-600" },
+]
 
 export function ClienteViewer({ cliente, onClose }: Props) {
   const [historico, setHistorico] = useState<HistoricoResponse | null>(null)
@@ -51,7 +96,6 @@ export function ClienteViewer({ cliente, onClose }: Props) {
     { label: "Cadastro",         data: cliente.dataCad },
     { label: "Aprovação",        data: cliente.dataApro },
     { label: "Assinatura",       data: cliente.dataAss },
-    { label: "1ª Mensalidade",   data: cliente.data1Mensalidade },
     { label: "Kick-off",         data: cliente.kickoff },
     { label: "Instalação",       data: cliente.dataInst },
     { label: "Trein. Cadastro",  data: cliente.treinamentoCadastro },
@@ -65,7 +109,7 @@ export function ClienteViewer({ cliente, onClose }: Props) {
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
@@ -90,32 +134,22 @@ export function ClienteViewer({ cliente, onClose }: Props) {
         <div className="p-6 space-y-6">
 
           {/* Dados principais */}
-          <section >
+          <section>
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
               Dados do cliente
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3.5">
-                <Building2 className="h-4 w-4 text-gray-400 shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-[11px] text-gray-400">CNPJ</p>
-                  <p className="text-sm font-medium text-gray-700 truncate">{cliente.cnpj || "—"}</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {DADOS_PRINCIPAIS(cliente).map(item => (
+                <div key={item.label} className="flex items-center gap-3 bg-gray-50 rounded-xl p-4">
+                  <span className={`flex items-center justify-center h-9 w-9 rounded-lg shrink-0 ${item.cor}`}>
+                    <item.icon className="h-4 w-4" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-[11px] text-gray-400">{item.label}</p>
+                    <p className="text-sm font-semibold text-gray-700 truncate">{item.valor}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3.5">
-                <Phone className="h-4 w-4 text-gray-400 shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-[11px] text-gray-400">Telefone</p>
-                  <p className="text-sm font-medium text-gray-700 truncate">{cliente.telefone || "—"}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 bg-gray-50 rounded-xl p-3.5">
-                <User className="h-4 w-4 text-gray-400 shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-[11px] text-gray-400">Nome do sócio</p>
-                  <p className="text-sm font-medium text-gray-700 truncate">—</p>
-                </div>
-              </div>         
+              ))}
             </div>
           </section>
 
@@ -124,20 +158,25 @@ export function ClienteViewer({ cliente, onClose }: Props) {
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
               Linha do tempo
             </p>
-            <div className="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-9 gap-2">
-              {timeline.map((item, i) => (
-                <div
-                  key={i}
-                  className={`rounded-xl p-2.5 text-center ${item.data ? "bg-blue-50" : "bg-gray-50"}`}
-                >
-                  <p className={`text-[10px] font-medium leading-tight mb-1 ${item.data ? "text-blue-500" : "text-gray-400"}`}>
-                    {item.label}
-                  </p>
-                  <p className={`text-[11px] font-bold leading-tight ${item.data ? "text-blue-700" : "text-gray-300"}`}>
-                    {formatarData(item.data)}
-                  </p>
-                </div>
-              ))}
+            <div className="flex flex-wrap justify-center gap-3">
+              {timeline.map((item, i) => {
+                const etapaSla = ETAPA_SLA_POR_LABEL[item.label]
+                const sla = etapaSla ? historico?.sla.find(s => s.etapa === etapaSla) : undefined
+                return (
+                  <div
+                    key={i}
+                    className={`flex-1 basis-28 max-w-[160px] rounded-xl p-3.5 text-center flex flex-col items-center ${item.data ? "bg-blue-50" : "bg-gray-50"}`}
+                  >
+                    <p className={`text-[11px] font-medium leading-tight mb-1.5 ${item.data ? "text-blue-500" : "text-gray-400"}`}>
+                      {item.label}
+                    </p>
+                    <p className={`text-xs font-bold leading-tight ${item.data ? "text-blue-700" : "text-gray-300"}`}>
+                      {formatarData(item.data)}
+                    </p>
+                    <SlaBadge sla={sla} />
+                  </div>
+                )
+              })}
             </div>
           </section>
 

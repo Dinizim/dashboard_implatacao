@@ -7,6 +7,7 @@
  */
 
 import type { EtapaCliente, StatusCliente, StatusPrazo } from "./cliente"
+import type { EtapaSla } from "./sla"
 
 export const ETAPA_LABEL: Record<EtapaCliente, string> = {
   SEM_KICKOFF: "Sem Kickoff",
@@ -28,4 +29,12 @@ export const PRAZO_LABEL: Record<StatusPrazo, string> = {
   OK:            "Dentro do prazo",
   PRIORIDADE:    "Atenção",
   FORA_DO_PRAZO: "Fora do prazo",
+}
+
+export const ETAPA_SLA_LABEL: Record<EtapaSla, string> = {
+  KICKOFF:    "Assinatura → Kick-off",
+  INSTALACAO: "Kick-off → Instalação",
+  CADASTRO:   "Instalação → Trein. Cadastro",
+  VENDAS:     "Trein. Cadastro → Trein. Vendas",
+  DEFINITIVO: "Trein. Vendas → Sup. Definitivo",
 }

@@ -3,13 +3,17 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import { type FiltroAtivo } from "@/app/types/dashboard";
-import { type Cliente } from "@/lib/domain/cliente";
+import { type Cliente } from "@/app/types/cliente";
 import { ClienteViewer } from "../ClienteViewer";
 import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface ClienteResumo {
   codigo: string;
   nome: string;
+  cnpj: string;
+  telefone: string;
+  quantidadeLicenca: number | null;
+  revenda: string;
   dias: number;
   etapaAtual: string;
   assinatura: string;
@@ -66,9 +70,11 @@ export function Viewer({ filtro, dataInicio, dataFim }: Props) {
     setClienteAberto({
       codigo: c.codigo,
       nome: c.nome,
-      cnpj: "",
+      cnpj: c.cnpj,
+      quantidadeLicenca: c.quantidadeLicenca,
+      revenda: c.revenda,
       endereco: "",
-      telefone: "",
+      telefone: c.telefone,
       dataCad: "",
       dataApro: "",
       dataAss: c.assinatura,
@@ -81,6 +87,7 @@ export function Viewer({ filtro, dataInicio, dataFim }: Props) {
       diasImplantacao: c.dias,
       dentroDoProazo: c.dias >= 40 ? "FORA" : "DENTRO",
       etapaAtual: c.etapaAtual,
+      status: "",
       semanas: [], // o ClienteViewer busca o histórico real direto da API
     })
   }
