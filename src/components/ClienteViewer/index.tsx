@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
-import { X, Building2, Phone, KeyRound, Store, Calendar, Loader2, User, Rocket, FileText, CheckCircle2, Clock } from "lucide-react"
+import { X, Building2, Phone, Store, Calendar, Loader2, User, Rocket, FileText, CheckCircle2, Clock } from "lucide-react"
 import { type Cliente } from "@/app/types/cliente"
 import { PRAZO_PRIORIDADE_DIAS, PRAZO_ALERTA_DIAS } from "@/lib/domain/cliente"
 import type { EtapaSla, StatusSla } from "@/lib/domain/sla"
@@ -75,9 +75,8 @@ interface Props {
 const DADOS_PRINCIPAIS = (cliente: Cliente) => [
   { label: "Nome",     valor: cliente.nome || "—", icon: User,      cor: "bg-blue-50 text-blue-600" },
   { label: "CNPJ",     valor: cliente.cnpj || "—", icon: Building2, cor: "bg-purple-50 text-purple-600" },
-  { label: "Licenças", valor: cliente.quantidadeLicenca != null ? String(cliente.quantidadeLicenca) : "—", icon: KeyRound, cor: "bg-amber-50 text-amber-600" },
   { label: "Telefone", valor: cliente.telefone || "—", icon: Phone, cor: "bg-emerald-50 text-emerald-600" },
-  { label: "Revenda",  valor: cliente.revenda || "—", icon: Store,  cor: "bg-rose-50 text-rose-600" },
+  { label: "Revenda",  valor: cliente.revenda || "—", icon: Store,  cor: "bg-rose-50 text-rose-600", largo: true },
 ]
 
 export function ClienteViewer({ cliente, onClose }: Props) {
@@ -138,9 +137,9 @@ export function ClienteViewer({ cliente, onClose }: Props) {
             <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
               Dados do cliente
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               {DADOS_PRINCIPAIS(cliente).map(item => (
-                <div key={item.label} className="flex items-center gap-3 bg-gray-50 rounded-xl p-4">
+                <div key={item.label} className={`flex items-center gap-3 bg-gray-50 rounded-xl p-4 ${item.largo ? "col-span-2" : ""}`}>
                   <span className={`flex items-center justify-center h-9 w-9 rounded-lg shrink-0 ${item.cor}`}>
                     <item.icon className="h-4 w-4" />
                   </span>
