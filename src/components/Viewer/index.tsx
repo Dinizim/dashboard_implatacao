@@ -6,6 +6,7 @@ import { type FiltroAtivo } from "@/app/types/dashboard";
 import { type Cliente } from "@/app/types/cliente";
 import { ClienteViewer } from "../ClienteViewer";
 import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { PRAZO_PRIORIDADE_DIAS, PRAZO_ALERTA_DIAS, PRAZO_MAXIMO_DIAS } from "@/lib/domain/cliente";
 
 interface ClienteResumo {
   codigo: string;
@@ -31,8 +32,8 @@ interface Props {
 }
 
 const prazoClass = (dias: number) => {
-  if (dias >= 50) return "bg-red-50 text-red-600"
-  if (dias >= 40) return "bg-yellow-50 text-yellow-600"
+  if (dias >= PRAZO_ALERTA_DIAS) return "bg-red-50 text-red-600"
+  if (dias >= PRAZO_PRIORIDADE_DIAS) return "bg-yellow-50 text-yellow-600"
   return "bg-blue-50 text-blue-600"
 }
 
@@ -84,9 +85,8 @@ export function Viewer({ filtro, dataInicio, dataFim }: Props) {
       treinamentoVendas: c.vendas,
       supDef: c.supDef,
       diasImplantacao: c.dias,
-      dentroDoProazo: c.dias >= 40 ? "FORA" : "DENTRO",
+      dentroDoProazo: c.dias >= PRAZO_MAXIMO_DIAS ? "FORA" : "DENTRO",
       etapaAtual: c.etapaAtual,
-      status: "",
       semanas: [], // o ClienteViewer busca o histórico real direto da API
     })
   }

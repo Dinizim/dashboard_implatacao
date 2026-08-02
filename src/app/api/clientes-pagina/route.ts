@@ -15,6 +15,7 @@ import {
   calcularStatusCliente,
   montarEndereco,
   montarTelefone,
+  PRAZO_MAXIMO_DIAS,
 } from "@/lib/domain/cliente"
 import { ETAPA_LABEL, STATUS_LABEL } from "@/lib/domain/labels"
 
@@ -47,7 +48,7 @@ export async function GET() {
         etapaAtual:         ETAPA_LABEL[etapa],
         status:             STATUS_LABEL[status],
         diasImplantacao:    dias,
-        dentroDoProazo:     dias >= 40 ? "FORA" : "DENTRO",
+        dentroDoProazo:     dias >= PRAZO_MAXIMO_DIAS ? "FORA" : "DENTRO",
       }
     })
 

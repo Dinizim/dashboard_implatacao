@@ -8,6 +8,7 @@
 import { NextRequest } from "next/server"
 import { db } from "@/lib/db"
 import { REVENDAS_PERMITIDAS, placeholdersRevendas } from "@/lib/domain/revendas"
+import { PRAZO_MAXIMO_DIAS } from "@/lib/domain/cliente"
 
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl
@@ -70,8 +71,13 @@ export async function GET(request: NextRequest) {
     const supDefinitivo  = doPeriodo.filter(c => c.etapasuportedefinitivo)
     const cancelados     = doPeriodo.filter(c => c.bloqueaprazo)
     const semKickoff     = emImplantacao.filter(c => !c.etapakickoff)
-    const dentroPrazo    = supDefinitivo.filter(c => c.dias_implantacao <= 60)
-    const foraPrazo      = supDefinitivo.filter(c => c.dias_implantacao > 60)
+
+    // Prazo: mede implantações CONCLUÍDAS no período (suporte definitivo assinado),
+    // comparando o tempo total (assinatura -> suporte definitivo) com o limite
+    // ideal de PRAZO_MAXIMO_DIAS. Mesma população/limiar usados no drill-down
+    // de lib/queries/clientes.ts, para o card e a lista aberta ao clicar sempre baterem.
+    const dentroPrazo = supDefinitivo.filter(c => c.dias_implantacao < PRAZO_MAXIMO_DIAS)
+    const foraPrazo   = supDefinitivo.filter(c => c.dias_implantacao >= PRAZO_MAXIMO_DIAS)
 
     return Response.json({
       clientes,

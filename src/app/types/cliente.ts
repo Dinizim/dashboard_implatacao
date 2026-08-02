@@ -27,7 +27,6 @@ export type Cliente = {
   diasImplantacao: number;
   dentroDoProazo: "DENTRO" | "FORA";
   etapaAtual: string;
-  status: string;
 
   semanas: Semana[];
 };

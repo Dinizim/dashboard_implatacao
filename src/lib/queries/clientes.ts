@@ -6,6 +6,7 @@
  */
 
 import { db } from "../db"
+import { PRAZO_MAXIMO_DIAS } from "@/lib/domain/cliente"
 
 // ─────────────────────────────────────────────
 // SELECT base — campos que todas as queries precisam
@@ -120,12 +121,15 @@ export async function buscarClientesPorKpi(
       sql: `${SELECT_CLIENTE_BASE} WHERE c.datacadastro BETWEEN $1 AND $2 AND c.etapasuportedefinitivo = true ORDER BY dias DESC`,
       params: [dataInicio, dataFim],
     },
+    // "fora_prazo"/"dentro_prazo" aqui são as implantações CONCLUÍDAS no
+    // período (suporte definitivo assinado), comparando o tempo total
+    // (assinatura -> suporte definitivo) com o limite ideal de PRAZO_MAXIMO_DIAS.
     fora_prazo: {
-      sql: `${SELECT_CLIENTE_BASE} WHERE c.dataassinaturacontrato IS NOT NULL AND c.etapasuportedefinitivo = false AND (c.bloqueaprazo = false OR c.bloqueaprazo IS NULL) AND (CURRENT_DATE - c.datacadastro) >= 40 ORDER BY dias DESC`,
-      params: [],
+      sql: `${SELECT_CLIENTE_BASE} WHERE c.datacadastro BETWEEN $1 AND $2 AND c.etapasuportedefinitivo = true AND (c.datasuportedefinitivo - c.dataassinaturacontrato) >= ${PRAZO_MAXIMO_DIAS} ORDER BY dias DESC`,
+      params: [dataInicio, dataFim],
     },
     dentro_prazo: {
-      sql: `${SELECT_CLIENTE_BASE} WHERE c.datacadastro BETWEEN $1 AND $2 AND c.dataassinaturacontrato IS NOT NULL AND c.etapasuportedefinitivo = false AND (c.bloqueaprazo = false OR c.bloqueaprazo IS NULL) AND (CURRENT_DATE - c.datacadastro) < 40 ORDER BY dias DESC`,
+      sql: `${SELECT_CLIENTE_BASE} WHERE c.datacadastro BETWEEN $1 AND $2 AND c.etapasuportedefinitivo = true AND (c.datasuportedefinitivo - c.dataassinaturacontrato) < ${PRAZO_MAXIMO_DIAS} ORDER BY dias DESC`,
       params: [dataInicio, dataFim],
     },
     nao_assinado: {

@@ -62,8 +62,8 @@ const KPIS_MENSAIS_CONFIG = [
   { label: "Sem Kick Off",                chave: "sem_kickoff",        icon: HeadsetIcon,      desc: "Clientes que ainda não realizaram o kick off" },
   { label: "Cancelamentos",               chave: "cancelados",         icon: Ban,              desc: "Cancelamentos no período" },
   { label: "Em Suportes Definitivos",     chave: "suporte_definitivo", icon: ClipboardPenIcon, desc: "Clientes que assinaram o Suporte Definitivo" },
-  { label: "Implantações Fora do Prazo",  chave: "fora_prazo",         icon: TimerOff,         desc: "Clientes fora do prazo" },
-  { label: "Implantações Dentro Prazo",   chave: "dentro_prazo",       icon: Clock,            desc: "Clientes dentro do prazo" },
+  { label: "Implant. Concluídas Fora do Prazo",  chave: "fora_prazo",   icon: TimerOff,         desc: "Concluídas no período em mais de 60 dias" },
+  { label: "Implant. Concluídas Dentro do Prazo", chave: "dentro_prazo", icon: Clock,           desc: "Concluídas no período em até 60 dias" },
   { label: "Não Assinados",               chave: "nao_assinado",       icon: Pen,              desc: "Clientes que ainda não assinaram" },
 ]
 

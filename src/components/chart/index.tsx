@@ -1,5 +1,5 @@
 "use client"
-import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts"
+import { PieChart, Pie, Cell, Tooltip, Legend, Sector } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
 import { ChartContainer } from "../ui/chart"
 import { type ChartConfig } from "@/components/ui/chart"
@@ -21,6 +21,16 @@ const chartConfig = {
 } satisfies ChartConfig
 
 const COLORS = ["#7c3aed", "#16a34a", "#2563eb", "#ca8a04", "#dc2626"]
+
+const renderActiveShape = (props: any) => {
+  const { cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill } = props;
+  return (
+    <g>
+      <Sector cx={cx} cy={cy} innerRadius={innerRadius} outerRadius={outerRadius + 10} startAngle={startAngle} endAngle={endAngle} fill={fill} />
+      <Sector cx={cx} cy={cy} innerRadius={outerRadius + 14} outerRadius={outerRadius + 18} startAngle={startAngle} endAngle={endAngle} fill={fill} opacity={0.3} />
+    </g>
+  );
+};
 
 type EtapaData = { etapa: string; value: number }
 

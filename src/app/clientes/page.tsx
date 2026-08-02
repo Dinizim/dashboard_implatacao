@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Eye, Search, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { ClienteViewer } from "@/components/ClienteViewer";
 import { type Cliente } from "@/app/types/cliente";
+import { PRAZO_PRIORIDADE_DIAS, PRAZO_ALERTA_DIAS } from "@/lib/domain/cliente";
 
 const POR_PAGINA = 50
 
@@ -17,8 +18,8 @@ const statusConfig: Record<string, { label: string; class: string }> = {
 }
 
 const prazoConfig = (dias: number) => {
-  if (dias >= 50) return { class: "text-red-600 font-bold", icon: "🔴" };
-  if (dias >= 40) return { class: "text-yellow-600 font-bold", icon: "🟡" };
+  if (dias >= PRAZO_ALERTA_DIAS) return { class: "text-red-600 font-bold", icon: "🔴" };
+  if (dias >= PRAZO_PRIORIDADE_DIAS) return { class: "text-yellow-600 font-bold", icon: "🟡" };
   return { class: "text-blue-600 font-semibold", icon: "🔵" };
 };
 
@@ -61,9 +62,9 @@ export default function ClientesPage() {
     const matchEtapa  = filtroEtapa  === "TODAS" || c.etapaAtual === filtroEtapa;
     const matchPrazo  =
       filtroPrazo === "TODOS" ||
-      (filtroPrazo === "0-39"  && c.diasImplantacao <= 39) ||
-      (filtroPrazo === "40-49" && c.diasImplantacao >= 40 && c.diasImplantacao <= 49) ||
-      (filtroPrazo === "50+"   && c.diasImplantacao >= 50);
+      (filtroPrazo === "0-39"  && c.diasImplantacao < PRAZO_PRIORIDADE_DIAS) ||
+      (filtroPrazo === "40-49" && c.diasImplantacao >= PRAZO_PRIORIDADE_DIAS && c.diasImplantacao < PRAZO_ALERTA_DIAS) ||
+      (filtroPrazo === "50+"   && c.diasImplantacao >= PRAZO_ALERTA_DIAS);
     return matchBusca && matchStatus && matchEtapa && matchPrazo;
   });
 

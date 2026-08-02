@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { X, Building2, Phone, KeyRound, Store, Calendar, Loader2, User, Rocket, FileText, CheckCircle2, Clock } from "lucide-react"
 import { type Cliente } from "@/app/types/cliente"
+import { PRAZO_PRIORIDADE_DIAS, PRAZO_ALERTA_DIAS } from "@/lib/domain/cliente"
 import type { EtapaSla, StatusSla } from "@/lib/domain/sla"
 
 function formatarData(data: string | null | undefined): string {
@@ -16,8 +17,8 @@ function formatarData(data: string | null | undefined): string {
 }
 
 const prazoColor = (dias: number) => {
-  if (dias >= 50) return "text-red-600 bg-red-50 border-red-200"
-  if (dias >= 40) return "text-yellow-600 bg-yellow-50 border-yellow-200"
+  if (dias >= PRAZO_ALERTA_DIAS) return "text-red-600 bg-red-50 border-red-200"
+  if (dias >= PRAZO_PRIORIDADE_DIAS) return "text-yellow-600 bg-yellow-50 border-yellow-200"
   return "text-blue-600 bg-blue-50 border-blue-200"
 }
 
@@ -164,7 +165,7 @@ export function ClienteViewer({ cliente, onClose }: Props) {
                 return (
                   <div
                     key={i}
-                    className={`flex-1 basis-28 max-w-[160px] rounded-xl p-3.5 text-center flex flex-col items-center ${item.data ? "bg-blue-50" : "bg-gray-50"}`}
+                    className={`flex-1 basis-28 max-w-40 rounded-xl p-3.5 text-center flex flex-col items-center ${item.data ? "bg-blue-50" : "bg-gray-50"}`}
                   >
                     <p className={`text-[11px] font-medium leading-tight mb-1.5 ${item.data ? "text-blue-500" : "text-gray-400"}`}>
                       {item.label}

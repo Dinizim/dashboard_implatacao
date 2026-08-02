@@ -52,7 +52,8 @@ export type StatusCliente = "ATIVO" | "ATRASADO" | "CONCLUIDO" | "CANCELADO"
 // ─────────────────────────────────────────────
 
 export const PRAZO_PRIORIDADE_DIAS = 40  // amarelo: atenção
-export const PRAZO_MAXIMO_DIAS     = 60  // vermelho: fora do prazo
+export const PRAZO_ALERTA_DIAS     = 50  // vermelho no selo: aviso antes do limite (o ideal é não passar de 60)
+export const PRAZO_MAXIMO_DIAS     = 60  // limite oficial: conta como "fora do prazo" nos KPIs
 
 // ─────────────────────────────────────────────
 // Funções de domínio
