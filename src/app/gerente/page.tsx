@@ -102,9 +102,6 @@ function PainelSla() {
             </p>
           </div>
         </div>
-        <Button variant="outline" size="sm" className="gap-1.5 shrink-0" onClick={handleLogout}>
-          <LogOut className="h-4 w-4" /> Sair
-        </Button>
       </div>
 
       {loading || !config ? (
