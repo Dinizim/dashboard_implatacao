@@ -42,3 +42,4 @@ next-env.d.ts
 /scripts
 eslint.config.mjs
 /docs
+image/preview.webp

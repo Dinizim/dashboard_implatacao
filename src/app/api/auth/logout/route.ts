@@ -1,12 +1,12 @@
 /**
- * POST /api/gerente/logout
+ * POST /api/auth/logout
  */
 
 import { NextResponse } from "next/server"
-import { GERENTE_COOKIE } from "@/lib/gerenteAuth"
+import { SESSION_COOKIE } from "@/lib/auth/session"
 
 export async function POST() {
   const response = NextResponse.json({ ok: true })
-  response.cookies.delete(GERENTE_COOKIE)
+  response.cookies.delete(SESSION_COOKIE)
   return response
 }

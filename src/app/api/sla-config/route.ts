@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { buscarSlaConfig, salvarSlaConfig } from "@/lib/queries/sla"
 import { ETAPAS_SLA_ORDEM, type SlaConfig } from "@/lib/domain/sla"
-import { verificarSessaoGerente } from "@/lib/gerenteAuth"
+import { verificarSessionToken, SESSION_COOKIE } from "@/lib/auth/session"
 
 export async function GET() {
   try {
@@ -20,7 +20,8 @@ export async function GET() {
 }
 
 export async function PUT(request: NextRequest) {
-  if (!verificarSessaoGerente(request)) {
+  const sessao = await verificarSessionToken(request.cookies.get(SESSION_COOKIE)?.value)
+  if (!sessao || sessao.role !== "gerente") {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 })
   }
 

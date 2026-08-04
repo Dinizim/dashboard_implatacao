@@ -1,13 +1,14 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ETAPA_SLA_LABEL } from "@/lib/domain/labels"
 import { ETAPAS_SLA_ORDEM, type EtapaSla, type SlaConfig } from "@/lib/domain/sla"
 import {
-  Lock, User, LogOut, Loader2, ShieldCheck, Rocket, Wrench,
+  LogOut, Loader2, ShieldCheck, Rocket, Wrench,
   ClipboardList, TrendingUp, CheckCircle2, Save, AlertCircle, Timer, Settings2,
 } from "lucide-react"
 
@@ -28,118 +29,18 @@ const COR_ETAPA: Record<EtapaSla, string> = {
 }
 
 export default function GerentePage() {
-  const [autenticado, setAutenticado] = useState<boolean | null>(null)
-
-  const verificarSessao = useCallback(() => {
-    fetch("/api/gerente/session")
-      .then(res => res.json())
-      .then(data => setAutenticado(!!data.autenticado))
-      .catch(() => setAutenticado(false))
-  }, [])
-
-  useEffect(() => { verificarSessao() }, [verificarSessao])
-
   return (
     <main className="sm:pl-14 min-h-screen w-full flex items-start justify-center p-4 pt-10 sm:pt-14 bg-gradient-to-b from-muted/50 to-background">
-      {autenticado === null ? (
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin" />
-          Carregando...
-        </div>
-      ) : autenticado ? (
-        <PainelSla onLogout={() => setAutenticado(false)} />
-      ) : (
-        <LoginGerente onLogin={() => setAutenticado(true)} />
-      )}
+      <PainelSla />
     </main>
-  )
-}
-
-// ============================================================
-// Login
-// ============================================================
-function LoginGerente({ onLogin }: { onLogin: () => void }) {
-  const [usuario, setUsuario] = useState("")
-  const [senha, setSenha] = useState("")
-  const [erro, setErro] = useState("")
-  const [carregando, setCarregando] = useState(false)
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setErro("")
-    setCarregando(true)
-    try {
-      const res = await fetch("/api/gerente/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuario, senha }),
-      })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        setErro(data.error ?? "Usuário ou senha inválidos")
-        return
-      }
-      onLogin()
-    } catch {
-      setErro("Não foi possível conectar. Tente novamente.")
-    } finally {
-      setCarregando(false)
-    }
-  }
-
-  return (
-    <Card className="w-full max-w-sm shadow-xl border-border/60 py-0 overflow-hidden">
-      <div className="bg-gradient-to-br from-primary to-primary/70 px-6 pt-8 pb-10 flex flex-col items-center text-center">
-        <div className="flex items-center justify-center h-14 w-14 rounded-2xl bg-white/15 text-primary-foreground backdrop-blur-sm mb-3 ring-1 ring-white/25">
-          <ShieldCheck className="h-7 w-7" />
-        </div>
-        <CardTitle className="text-primary-foreground text-lg">Área do Gerente</CardTitle>
-        <CardDescription className="text-primary-foreground/80 mt-1">
-          Acesso restrito para gestão dos SLAs de implantação
-        </CardDescription>
-      </div>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="flex flex-col gap-3 -mt-5 bg-card rounded-t-2xl pt-6">
-          <div className="relative">
-            <User className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Usuário"
-              className="pl-8"
-              value={usuario}
-              onChange={e => setUsuario(e.target.value)}
-              autoFocus
-            />
-          </div>
-          <div className="relative">
-            <Lock className="absolute left-2.5 top-2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="password"
-              placeholder="Senha"
-              className="pl-8"
-              value={senha}
-              onChange={e => setSenha(e.target.value)}
-            />
-          </div>
-          {erro && (
-            <p className="text-sm text-destructive flex items-center gap-1.5">
-              <AlertCircle className="h-4 w-4 shrink-0" /> {erro}
-            </p>
-          )}
-        </CardContent>
-        <CardFooter className="pb-6">
-          <Button type="submit" className="w-full" disabled={carregando}>
-            {carregando ? <Loader2 className="h-4 w-4 animate-spin" /> : "Entrar"}
-          </Button>
-        </CardFooter>
-      </form>
-    </Card>
   )
 }
 
 // ============================================================
 // Painel de SLA
 // ============================================================
-function PainelSla({ onLogout }: { onLogout: () => void }) {
+function PainelSla() {
+  const router = useRouter()
   const [config, setConfig] = useState<SlaConfig | null>(null)
   const [loading, setLoading] = useState(true)
   const [salvando, setSalvando] = useState(false)
@@ -153,8 +54,9 @@ function PainelSla({ onLogout }: { onLogout: () => void }) {
   }, [])
 
   async function handleLogout() {
-    await fetch("/api/gerente/logout", { method: "POST" }).catch(() => {})
-    onLogout()
+    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {})
+    router.push("/login")
+    router.refresh()
   }
 
   async function handleSalvar() {
