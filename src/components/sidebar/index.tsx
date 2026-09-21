@@ -1,35 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
 import { Sheet,SheetTrigger,SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "../ui/button";
 import Link from "next/link";
-import { ChartArea, Home, LogOut, Package, PanelBottom, Settings, User, UserCog } from "lucide-react";
+import { ChartArea, Home, Package, PanelBottom, Settings, User, UserCog } from "lucide-react";
 import { SlaAlertas } from "@/components/SlaAlertas";
 
 
 export function Sidebar() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const [ehGerente, setEhGerente] = useState(false);
-
-  useEffect(() => {
-    if (pathname === "/login") return;
-    fetch("/api/auth/session")
-      .then(res => res.json())
-      .then(data => setEhGerente(data.role === "gerente"))
-      .catch(() => setEhGerente(false));
-  }, [pathname]);
-
-  async function handleSair() {
-    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
-    router.push("/login");
-    router.refresh();
-  }
-
-  if (pathname === "/login") return null;
-
   return (
     <div className="flex w-full flex-col bg-muted/40">
 
@@ -61,27 +39,15 @@ export function Sidebar() {
                       <User className="h-4 w-4" />
                       <span className="sr-only">clientes</span>
                     </Link>
-                    {ehGerente && (
-                      <Link
-                        href="/gerente"
-                        title="Gerente"
-                        className=" flex items-center h-9 w-9  rounded-lg text-muted-foreground justify-center shrink-0 transition-colors hover:text-foreground"
-                      >
-                        <UserCog className="h-4 w-4" />
-                        <span className="sr-only">Gerente</span>
-                      </Link>
-                    )}
-
-            </nav>
-            <nav className="mt-auto flex flex-col items-center gap-4 py-5 px-2">
-                    <button
-                      onClick={handleSair}
-                      title="Sair"
+                    <Link
+                      href="/gerente"
+                      title="Gerente"
                       className=" flex items-center h-9 w-9  rounded-lg text-muted-foreground justify-center shrink-0 transition-colors hover:text-foreground"
                     >
-                      <LogOut className="h-4 w-4 text-red-500" />
-                      <span className="sr-only">Sair</span>
-                    </button>
+                      <UserCog className="h-4 w-4" />
+                      <span className="sr-only">Gerente</span>
+                    </Link>
+
             </nav>
         </aside>
 
@@ -129,15 +95,13 @@ export function Sidebar() {
                      <User className="h-5 w-5 transition-all" />
                      Clientes
                      </Link>
-                      {ehGerente && (
-                        <Link href="/gerente"
-                             className="flex items-center px-2.5 text-muted-foreground hover:text-foreground gap-4"
-                             prefetch={false}
-                       >
-                       <UserCog className="h-5 w-5 transition-all" />
-                       Gerente
-                       </Link>
-                      )}
+                      <Link href="/gerente"
+                           className="flex items-center px-2.5 text-muted-foreground hover:text-foreground gap-4"
+                           prefetch={false}
+                     >
+                     <UserCog className="h-5 w-5 transition-all" />
+                     Gerente
+                     </Link>
                       <Link href="#"
                            className="flex items-center px-2.5 text-muted-foreground hover:text-foreground gap-4"
                            prefetch={false}
@@ -145,13 +109,6 @@ export function Sidebar() {
                      <Settings className="h-5 w-5 transition-all" />
                      Configurações
                      </Link>
-                     <button
-                       onClick={handleSair}
-                       className="flex items-center px-2.5 text-muted-foreground hover:text-foreground gap-4"
-                     >
-                     <LogOut className="h-5 w-5 transition-all text-red-500" />
-                     Sair
-                     </button>
                    </nav>
                  </SheetContent>
                </Sheet>

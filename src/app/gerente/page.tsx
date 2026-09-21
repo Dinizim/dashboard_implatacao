@@ -1,14 +1,13 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { ETAPA_SLA_LABEL } from "@/lib/domain/labels"
 import { ETAPAS_SLA_ORDEM, type EtapaSla, type SlaConfig } from "@/lib/domain/sla"
 import {
-  LogOut, Loader2, ShieldCheck, Rocket, Wrench,
+  Loader2, ShieldCheck, Rocket, Wrench,
   ClipboardList, TrendingUp, CheckCircle2, Save, AlertCircle, Timer, Settings2,
 } from "lucide-react"
 
@@ -40,7 +39,6 @@ export default function GerentePage() {
 // Painel de SLA
 // ============================================================
 function PainelSla() {
-  const router = useRouter()
   const [config, setConfig] = useState<SlaConfig | null>(null)
   const [loading, setLoading] = useState(true)
   const [salvando, setSalvando] = useState(false)
@@ -52,12 +50,6 @@ function PainelSla() {
       .then(data => setConfig(data.config))
       .finally(() => setLoading(false))
   }, [])
-
-  async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST" }).catch(() => {})
-    router.push("/login")
-    router.refresh()
-  }
 
   async function handleSalvar() {
     if (!config) return
